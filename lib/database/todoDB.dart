@@ -5,6 +5,7 @@ class SQLHelper {
     await database.execute("""CREATE TABLE items(
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         title text,
+        description text,
         createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
       )
       """);
@@ -22,10 +23,10 @@ class SQLHelper {
   }
 
   // Create new item 
-  static Future<int> createItem(String title) async {
+  static Future<int> createItem(String title, String description) async {
     final db = await SQLHelper.db();
 
-    final data = {'title': title};
+    final data = {'title': title, 'description':description};
     final id = await db.insert('items', data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
     return id;
@@ -43,11 +44,12 @@ class SQLHelper {
   
   // Update an item by id
   static Future<int> updateItem(
-      int id, String title) async {
+      int id, String title, String description) async {
     final db = await SQLHelper.db();
 
     final data = {
       'title': title,
+      'description':description,
       'createdAt': DateTime.now().toString()
     };
 

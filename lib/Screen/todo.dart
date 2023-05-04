@@ -23,6 +23,7 @@ class _HomepageState extends State<Homepage> {
   }
 
   final addTaskController = TextEditingController();
+  final addDescriptionController = TextEditingController();
   @override
   void initState() {
     super.initState();
@@ -45,6 +46,7 @@ class _HomepageState extends State<Homepage> {
         itemBuilder: (context, index) {
           return CustomWidget(
             taskName: toDoList[index]['title'],
+             description: toDoList[index]['description'] ?? '',
             id: toDoList[index]['id'], onClicked: ()async { 
               await createNewTask(toDoList[index]['id']);
              },
@@ -71,22 +73,15 @@ class _HomepageState extends State<Homepage> {
 
   // update an item on the list
   Future<void> _updateItem(int id) async {
-    await SQLHelper.updateItem(id, addTaskController.text);
+    await SQLHelper.updateItem(id, addTaskController.text, addDescriptionController.text);
     retrieveItemsFromDatabase();
   }
   //delete an item from the list
 
-  Future<void> _deleteItem(int id) async {
-    await SQLHelper.deleteItem(
-      id,
-    );
-    retrieveItemsFromDatabase();
-  }
   
-
   //add an item to the list
   Future<void> _addItem() async {
-    await SQLHelper.createItem(addTaskController.text);
+    await SQLHelper.createItem(addTaskController.text,addDescriptionController.text);
     retrieveItemsFromDatabase();
   }
 
@@ -99,6 +94,7 @@ class _HomepageState extends State<Homepage> {
         final existingList =
       toDoList.firstWhere((element) => element['id'] == id);
       addTaskController.text = existingList['title'];
+       addDescriptionController.text = existingList['description'];
       }
     showDialog(
       context: context,
@@ -106,7 +102,7 @@ class _HomepageState extends State<Homepage> {
         return AlertDialog(
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
           content: Container(
-            height: MediaQuery.of(context).size.height * 0.19,
+            height: MediaQuery.of(context).size.height * 0.25,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -131,6 +127,23 @@ class _HomepageState extends State<Homepage> {
                     const SizedBox(
                       height: 20,
                     ),
+                    TextFormField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Enter the description';
+                        }
+                      },
+                      controller: addDescriptionController,
+                      decoration: const InputDecoration(
+                          border: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(width: 5, color: Colors.white)),
+                          hintText: "Write the description"),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -148,6 +161,7 @@ await _addItem();
                               }
                               
                               addTaskController.text = '';
+                              addDescriptionController.text='';
 
 
                               Navigator.of(context).pop();

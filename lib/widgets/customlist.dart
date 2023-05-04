@@ -5,6 +5,7 @@ import 'package:todo/database/todoDB.dart';
 
 class CustomWidget extends StatefulWidget {
   final String taskName;
+  final String? description;
   final int id;
   final Function() onClicked;
 
@@ -15,6 +16,7 @@ class CustomWidget extends StatefulWidget {
     required this.taskName,
     required this.id,
     required this.onClicked,
+     this.description,
   }) : super(key: key);
 
   @override
@@ -84,15 +86,14 @@ setState(() {
                         ? TextDecoration.lineThrough
                         : TextDecoration.none),
               ),
-              subtitle: Text( taskCompleted!? "Done" :"Pending",
-               
-                style: const TextStyle(
-                    color:Color.fromARGB(255, 0, 0, 0),
-                    letterSpacing: 0.5,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400,
-                   ),
-              ),
+              
+              subtitle:Text(widget.description!,style:  TextStyle(
+                color:Color.fromARGB(255, 0, 0, 0),
+                letterSpacing: 0.5,
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                decoration: taskCompleted! ? TextDecoration.lineThrough: TextDecoration.none
+               ),),
               trailing: IconButton(onPressed: widget.onClicked, icon: const Icon(Icons.edit, color: Colors.blue
               ,),),
             ),
