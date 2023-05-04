@@ -3,7 +3,7 @@ class Button extends StatelessWidget {
   final String text;
   final Function() onPressed;
  final  Color color;
-  const Button({super.key, required this.text, required this.onPressed, required this.color});
+  const Button( {super.key, required this.text, required this.onPressed, required this.color});
 
   @override
   Widget build(BuildContext context) {

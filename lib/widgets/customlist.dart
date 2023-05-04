@@ -1,19 +1,42 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:todo/Screen/todo.dart';
+import 'package:todo/database/todoDB.dart';
 
-class CustomWidget extends StatelessWidget {
+class CustomWidget extends StatefulWidget {
   final String taskName;
-  final String taskDescription;
-  final bool taskCompleted;
-  final Function(bool?)? onChanged;
+  final int id;
+  final Function() onClicked;
+
+  
+
+  const CustomWidget({
+    Key? key,
+    required this.taskName,
+    required this.id,
+    required this.onClicked,
+  }) : super(key: key);
+
+  @override
+  State<CustomWidget> createState() => _CustomWidgetState();
+}
+
+class _CustomWidgetState extends State<CustomWidget> {
+   List<Map<String, dynamic>> toDoList = [];
+  
+   bool? taskCompleted = false;
+
   final TextDecoration textDecoration = TextDecoration.lineThrough;
-  const CustomWidget(
-      {super.key,
-      required this.taskName,
-      required this.taskCompleted,
-      required this.onChanged,
-      required this.taskDescription});
+   final addTaskController = TextEditingController();
+   
+
+   Future<void> _deleteItem(int id) async {
+  await SQLHelper.deleteItem(id);
+  final data = await SQLHelper.getItems();
+  setState(() {
+    toDoList = data;
+  });
+}
 
   @override
   Widget build(BuildContext context) {
@@ -21,49 +44,61 @@ class CustomWidget extends StatelessWidget {
         padding: const EdgeInsets.only(left: 20.0, top: 20, right: 20),
         child: Slidable(
           endActionPane: ActionPane(
-            motion: StretchMotion(),
+            motion:const StretchMotion(),
             children: [
               SlidableAction(
-                onPressed: (context) {},
+                onPressed: (context) {
+                 _deleteItem(widget.id);
+                  Navigator.of(context).pushAndRemoveUntil(
+  MaterialPageRoute(builder: (context) => const Homepage()),
+  (route) => false,
+);
+                },
                
                 icon: Icons.delete, 
-                backgroundColor: Color.fromARGB(255, 255, 0, 0),
-              )
+                backgroundColor:const Color.fromARGB(255, 255, 0, 0),
+              ),
             ],
           ),
           child: Material(
             elevation: 5.0,
-  shadowColor: Colors.blueGrey,
+  shadowColor:const Color.fromARGB(255, 3, 94, 139),
             child: ListTile(
                    tileColor: Colors.white,
               leading: Checkbox(
                   activeColor: Colors.black,
                   value: taskCompleted,
-                  onChanged: onChanged),
+                  onChanged: (bool? value){
+setState(() {
+      taskCompleted = value;
+    });
+                  }),
               title: Text(
-                taskName,
+                widget.taskName,
                 style: TextStyle(
-                    color: Color.fromARGB(255, 0, 0, 0),
+                    color: const Color.fromARGB(255, 0, 0, 0),
                     letterSpacing: 0.5,
                     fontSize: 15,
-                    fontWeight: FontWeight.w400,
-                    decoration: taskCompleted
+                    fontWeight: FontWeight.w500,
+                    decoration: taskCompleted!
                         ? TextDecoration.lineThrough
                         : TextDecoration.none),
               ),
-              subtitle: Text(
-                taskDescription,
-                style: TextStyle(
-                    color: Color.fromARGB(255, 0, 0, 0),
+              subtitle: Text( taskCompleted!? "Done" :"Pending",
+               
+                style: const TextStyle(
+                    color:Color.fromARGB(255, 0, 0, 0),
                     letterSpacing: 0.5,
-                    fontSize: 12,
+                    fontSize: 13,
                     fontWeight: FontWeight.w400,
-                    decoration: taskCompleted
-                        ? TextDecoration.lineThrough
-                        : TextDecoration.none),
+                   ),
               ),
+              trailing: IconButton(onPressed: widget.onClicked, icon: const Icon(Icons.edit, color: Colors.blue
+              ,),),
             ),
           ),
         ));
+        
   }
+  
 }
